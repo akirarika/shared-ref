@@ -2,6 +2,10 @@
 
 SharedRef allows you to create synchronized refs across tabs, suitable for Vue framework.
 
+This can easily allow you to achieve: the function of synchronizing login in other tabs when one tab logs in. Alternatively, when a user changes certain configurations, other tabs will also automatically take effect.
+
+You can even use your imagination to easily synchronize data between iframes. Moreover, if you are using Electron or doing some hybrid development, you can also synchronize data between multiple webviews.
+
 Under the hood, we create a SharedWorker to maintain the state of refs, synchronizing changes in values across multiple tabs.
 
 If the user's browser does not support SharedWorker, it will automatically fall back to using Worker to achieve the same.
@@ -221,4 +225,20 @@ const sharedRefWorker = defineSharedRefWorker({
     }
   },
 });
+```
+
+## Broadcasting in SharedWorker
+
+When you are in a Worker and need to notify that certain values have changed, you can use the `broadcast` method. This will automatically update the values in all SharedRefs using that key.
+
+For example, imagine you are developing a to-do app that syncs data across multiple devices. When you complete a to-do item on your phone, the completed item is sent to the server. Upon receiving it, the server then sends the completed to-do item to your computer. In your SharedWorker, upon receiving the data from the server, you want to propagate it to all SharedRefs.
+
+In this scenario, you can use the `broadcast` method to ensure that all open tabs in the browser reflect the completion of that specific to-do item.
+
+```ts
+const sharedRefWorker = defineSharedRefWorker({
+  // ...
+});
+
+sharedRefWorker.broadcast(key, value);
 ```
