@@ -1,0 +1,35 @@
+{
+  "name": "shared-ref",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "typings": "./dist/index.d.ts",
+  "module": "./dist/shared-ref.js",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "vue-tsc": "vue-tsc",
+    "p": "vite build && npm publish"
+  },
+  "dependencies": {
+    "@okikio/sharedworker": "^1.0.7",
+    "nanoid": "^5.0.7",
+    "vue": "*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@types/bun": "latest",
+    "@types/lodash-es": "^4.17.12",
+    "@vitejs/plugin-vue": "^5.1.1",
+    "vite": "^5.3.5",
+    "vite-plugin-dts": "^4.0.0-beta.2",
+    "vue-tsc": "^2.0.29"
+  },
+  "peerDependencies": {
+    "typescript": "5.5.4"
+  }
+}
