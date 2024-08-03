@@ -135,7 +135,6 @@ When all tabs are closed, data will be lost as the SharedWorker is destroyed. Wh
 import { defineSharedRefWorker, IndexedDBHandler } from 'shared-ref';
 
 const sharedRefWorker = defineSharedRefWorker({
-  debug: true,
   ...IndexedDBHandler(),
 });
 ```
