@@ -1,7 +1,8 @@
+import { SharedWorkerPolyfill } from '@okikio/sharedworker';
 import { Ref } from 'vue';
 
 export type SharedRefOptions = {
-    url: URL;
+    worker: () => SharedWorkerPolyfill;
     debug?: boolean;
 };
 declare global {

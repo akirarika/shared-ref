@@ -10,7 +10,7 @@ const waitingGet = new Map<string, PromiseWithResolvers<any>>();
 const refs = new Map<string, RefController<any>>();
 
 export type SharedRefOptions = {
-  url: URL;
+  worker: () => SharedWorkerPolyfill;
   debug?: boolean;
 };
 
@@ -21,9 +21,8 @@ declare global {
 }
 
 export const initSharedRef = (options: SharedRefOptions) => {
-  worker = new SharedWorkerPolyfill(options.url, {
-    type: "module",
-  });
+  (window as any).SharedWorker = SharedWorkerPolyfill;
+  worker = options.worker();
 
   worker.port.start();
 
@@ -48,7 +47,7 @@ export const initSharedRef = (options: SharedRefOptions) => {
     type: "PING",
   });
 
-  if (typeof window !== "undefined") (window as any).sharedRef = sharedRef;
+  if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") (window as any).sharedRef = sharedRef;
 };
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any> }): Promise<Ref<T>> => {

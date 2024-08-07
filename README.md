@@ -62,7 +62,9 @@ Load this Worker when the page initializes. Place this in your `index.ts` or `ma
 import { initSharedRef } from "shared-ref";
 
 initSharedRef({
-  url: new URL("./worker.ts", import.meta.url)
+  worker: () => (new SharedWorker(new URL("./worker.ts", import.meta.url), {
+    type: "module",
+  }))
 });
 
 // Next comes your Vue initialization code
