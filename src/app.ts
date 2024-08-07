@@ -48,7 +48,7 @@ export const initSharedRef = (options: SharedRefOptions) => {
     type: "PING",
   });
 
-  if (typeof window === "undefined") (window as any).sharedRef = sharedRef;
+  if (typeof window !== "undefined") (window as any).sharedRef = sharedRef;
 };
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any> }): Promise<Ref<T>> => {
