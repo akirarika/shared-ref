@@ -1,19 +1,13 @@
 {
   "name": "shared-ref",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "type": "module",
-  "typings": "./dist/index.d.ts",
-  "module": "./dist/shared-ref.js",
-  "files": [
-    "dist",
-    "LICENSE"
-  ],
+  "module": "./src/index.ts",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "vue-tsc": "vue-tsc",
-    "p": "vite build && npm publish"
+    "vue-tsc": "vue-tsc"
   },
   "dependencies": {
     "@okikio/sharedworker": "^1.0.7",
