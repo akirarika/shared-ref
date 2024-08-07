@@ -1,8 +1,9 @@
-import { SharedWorkerPolyfill } from '@okikio/sharedworker';
 import { Ref } from 'vue';
 
 export type SharedRefOptions = {
-    worker: () => SharedWorkerPolyfill;
+    worker: () => {
+        addEventListener: Function;
+    };
     debug?: boolean;
 };
 declare global {
