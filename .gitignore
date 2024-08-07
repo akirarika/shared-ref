@@ -1,2 +1,3 @@
-/dist
-node_modules
+/node_modules
+/typings/shared-ref.js
+/typings/shared-ref.umd.cjs
