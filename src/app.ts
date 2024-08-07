@@ -14,6 +14,12 @@ export type SharedRefOptions = {
   debug?: boolean;
 };
 
+declare global {
+  interface Window {
+    sharedRef: typeof sharedRef;
+  }
+}
+
 export const initSharedRef = (options: SharedRefOptions) => {
   worker = new SharedWorkerPolyfill(options.url, {
     type: "module",
@@ -41,6 +47,8 @@ export const initSharedRef = (options: SharedRefOptions) => {
   worker!.postMessage({
     type: "PING",
   });
+
+  window.sharedRef = sharedRef;
 };
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any> }): Promise<Ref<T>> => {
