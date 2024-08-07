@@ -26,5 +26,10 @@
     "types": [
       "@vue/runtime-dom"
     ]
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ]
 }
