@@ -21,7 +21,7 @@ declare global {
 }
 
 export const initSharedRef = (options: SharedRefOptions) => {
-  worker = options.worker(SharedWorkerPolyfill as any) as SharedWorkerPolyfill;
+  worker = options.worker({ SharedWorker: SharedWorkerPolyfill as any }) as SharedWorkerPolyfill;
 
   worker.port.start();
 
