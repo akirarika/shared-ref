@@ -286,3 +286,6 @@ Of course, you can always access all the ports:
 sharedRefWorker.ports; // Set<MessagePort>
 ```
 
+## SSR/SSG
+
+You can use it in SSR/SSG, and its initial value will always be your `value` during server-side rendering. When it comes to the client payload, its value will be read from the SharedWorker.
