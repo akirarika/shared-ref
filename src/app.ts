@@ -10,7 +10,7 @@ const waitingGet = new Map<string, PromiseWithResolvers<any>>();
 const refs = new Map<string, RefController<any>>();
 
 export type SharedRefOptions = {
-  worker: (sharedWorker: SharedWorker) => { addEventListener: Function };
+  worker: (sharedWorker: new (scriptURL: string | URL, options?: string | WorkerOptions) => SharedWorker) => { addEventListener: Function };
   debug?: boolean;
 };
 
