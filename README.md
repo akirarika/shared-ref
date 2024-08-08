@@ -245,3 +245,44 @@ const sharedRefWorker = defineSharedRefWorker({
 
 sharedRefWorker.broadcast(key, value);
 ```
+
+## Vanilla Worker
+
+SharedRef can also serve as a simple wrapper for your Worker/SharedWorker. The return value of the `initSharedRef` method is a populated SharedWorker Polyfill object that you can use just like a plain SharedWorker, even implemented with Worker in browsers that don't natively support it.
+
+```ts
+const sharedWorker = initSharedRef({
+  worker: ({ SharedWorker }) => (new SharedWorker(new URL("./worker.ts", import.meta.url), {
+    type: "module",
+  }))
+});
+
+sharedWorker.postMessage("hello world")
+```
+
+Within a SharedWorker, you can receive messages. Don't worry, messages within sharedRef have been filtered, and you will only receive those that sharedRef does not recognize.
+
+```ts
+const sharedRefWorker = defineSharedRefWorker({
+  // ...
+});
+
+sharedRefWorker.on("message", (event) => { 
+  console.log(event.data); // echo: hello world
+});
+```
+
+If you want to do something while connecting to any page:
+
+```ts
+sharedRefWorker.on("connect", (event) => { 
+  event.port.postMessage("connected!");
+});
+```
+
+Of course, you can always access all the ports:
+
+```ts
+sharedRefWorker.ports; // Set<MessagePort>
+```
+

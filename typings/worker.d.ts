@@ -1,3 +1,5 @@
+import { Emitter } from 'mitt';
+
 type SharedRefWorkerOptionsBase = {
     debug?: boolean;
     bootstrap?: () => Promise<void> | void;
@@ -21,7 +23,14 @@ type SharedRefWorkerOptionsBaseHandlers = {
     }) => void | Promise<void>;
 };
 export type SharedRefWorkerOptions = SharedRefWorkerOptionsBase | (SharedRefWorkerOptionsBase & SharedRefWorkerOptionsBaseHandlers);
-export declare const defineSharedRefWorker: (options: SharedRefWorkerOptions) => {
-    broadcast(key: string, value: any): void;
+export type WorkerEmitter = Emitter<{
+    connect: {
+        port: MessagePort;
+    };
+    message: MessageEvent<any>;
+}> & {
+    broadcast: (key: string, value: any) => void;
+    ports: Set<MessagePort>;
 };
+export declare const defineSharedRefWorker: (options: SharedRefWorkerOptions) => WorkerEmitter;
 export {};

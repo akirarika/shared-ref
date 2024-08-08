@@ -1,3 +1,4 @@
+import { SharedWorkerPolyfill } from '@okikio/sharedworker';
 import { Ref } from 'vue';
 
 export type SharedRefOptions = {
@@ -13,7 +14,7 @@ declare global {
         sharedRef: typeof sharedRef;
     }
 }
-export declare const initSharedRef: (options: SharedRefOptions) => void;
+export declare const initSharedRef: (options: SharedRefOptions) => SharedWorkerPolyfill;
 export declare const sharedRef: <T>(options: {
     key: string;
     value: T;

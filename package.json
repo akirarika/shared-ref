@@ -1,6 +1,6 @@
 {
   "name": "shared-ref",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "MIT",
   "type": "module",
   "typings": "./typings/index.d.ts",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@okikio/sharedworker": "^1.0.7",
+    "mitt": "^3.0.1",
     "nanoid": "^5.0.7",
     "vue": "*"
   },
@@ -19,6 +20,7 @@
     "@biomejs/biome": "^1.8.3",
     "@types/bun": "latest",
     "@types/lodash-es": "^4.17.12",
+    "@types/sharedworker": "^0.0.120",
     "@vitejs/plugin-vue": "^5.1.1",
     "vite": "^5.3.5",
     "vite-plugin-dts": "^4.0.0-beta.2",

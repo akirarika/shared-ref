@@ -20,7 +20,7 @@ declare global {
   }
 }
 
-export const initSharedRef = (options: SharedRefOptions) => {
+export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill => {
   worker = options.worker({ SharedWorker: SharedWorkerPolyfill as any }) as SharedWorkerPolyfill;
 
   worker.port.start();
@@ -28,12 +28,12 @@ export const initSharedRef = (options: SharedRefOptions) => {
   worker.addEventListener("message", (e) => {
     if (options?.debug) console.log("[SharedRef] onmessage", e);
     const data = e.data as SharedRefMessage;
-    if (data.type === "PONG") {
+    if (data.type === "SHARED_REF$PONG") {
       workerReady.resolve(undefined);
-    } else if (data.type === "RESULT") {
+    } else if (data.type === "SHARED_REF$RESULT") {
       const resolvers = waitingGet.get(data.id);
       resolvers?.resolve(data);
-    } else if (data.type === "SYNC") {
+    } else if (data.type === "SHARED_REF$SYNC") {
       const ref = refs.get(data.key);
       if (ref) {
         ref.value = data.value;
@@ -43,10 +43,12 @@ export const initSharedRef = (options: SharedRefOptions) => {
   });
 
   worker!.postMessage({
-    type: "PING",
+    type: "SHARED_REF$PING",
   });
 
   if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") (window as any).sharedRef = sharedRef;
+
+  return worker;
 };
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any> }): Promise<Ref<T>> => {
@@ -57,7 +59,7 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
     const id = `${options.key}_${nanoid()}`;
     waitingGet.set(id, resolvers);
     worker!.postMessage({
-      type: "GET",
+      type: "SHARED_REF$GET",
       key: options.key,
       meta: options.meta ?? {},
       id: id,
@@ -86,7 +88,7 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
           refController.value = newValue;
           refController.trigger();
           worker!.postMessage({
-            type: "SET",
+            type: "SHARED_REF$SET",
             key: options.key,
             meta: options.meta ?? {},
             value: newValue,

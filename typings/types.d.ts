@@ -2,32 +2,32 @@ import { Ref } from 'vue';
 
 export type SharedRefMessage = SharedRefMessagePing | SharedRefMessagePong | SharedRefMessageGet | SharedRefMessageResult | SharedRefMessageSet | SharedRefMessageSync;
 export type SharedRefMessagePing = {
-    type: "PING";
+    type: "SHARED_REF$PING";
 };
 export type SharedRefMessagePong = {
-    type: "PONG";
+    type: "SHARED_REF$PONG";
 };
 export type SharedRefMessageGet = {
-    type: "GET";
+    type: "SHARED_REF$GET";
     key: string;
     meta: Record<string, any>;
     id: string;
 };
 export type SharedRefMessageResult = {
-    type: "RESULT";
+    type: "SHARED_REF$RESULT";
     key: string;
     id: string;
     empty: boolean;
     value: any;
 };
 export type SharedRefMessageSet = {
-    type: "SET";
+    type: "SHARED_REF$SET";
     key: string;
     meta: Record<string, any>;
     value: any;
 };
 export type SharedRefMessageSync = {
-    type: "SYNC";
+    type: "SHARED_REF$SYNC";
     key: string;
     value: any;
 };
