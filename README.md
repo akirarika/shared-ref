@@ -88,6 +88,8 @@ The parameter for sharedRef is an object, where `value` is the initial value of 
 
 It's worth noting that the return value of the sharedRef method is a Promise, so you need to add the `await` keyword to wait for it to load (which is very fast).
 
+Why is a key necessary? Because Symbols cannot be passed across, and perhaps, you might need to maintain data synchronization between different pages for the same data (for example, a sharedRef for a user avatar on both the personal information page and the homepage, which are not the same instance of sharedRef but need to remain consistent).
+
 ## Suspense
 
 Since sharedRef is asynchronously loaded, we need to wrap it with the Suspense component to make Vue support asynchronous components.

@@ -70,6 +70,8 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
       value = options.value;
     }
 
+    if (refs.has(options.key)) return refs.get(options.key)!.ref;
+
     const refController = {} as RefController<any>;
     refController.ref = customRef((track, trigger) => {
       refController.track = track;
@@ -92,7 +94,6 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
         },
       };
     });
-    if (refs.has(options.key)) throw new Error(`[SharedRef] Multiple sharedRefs are using the same key: '${options.key}'.`);
 
     refs.set(options.key, refController);
 
