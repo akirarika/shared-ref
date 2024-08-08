@@ -62,7 +62,7 @@ Load this Worker when the page initializes. Place this in your `index.ts` or `ma
 import { initSharedRef } from "shared-ref";
 
 initSharedRef({
-  worker: () => (new SharedWorker(new URL("./worker.ts", import.meta.url), {
+  worker: ({ SharedWorker }) => (new SharedWorker(new URL("./worker.ts", import.meta.url), {
     type: "module",
   }))
 });

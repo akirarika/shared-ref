@@ -1,7 +1,9 @@
 import { Ref } from 'vue';
 
 export type SharedRefOptions = {
-    worker: (sharedWorker: new (scriptURL: string | URL, options?: string | WorkerOptions) => SharedWorker) => {
+    worker: (data: {
+        SharedWorker: new (scriptURL: string | URL, options?: string | WorkerOptions) => SharedWorker;
+    }) => {
         addEventListener: Function;
     };
     debug?: boolean;
