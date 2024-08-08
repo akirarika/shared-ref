@@ -10,7 +10,7 @@ const waitingGet = new Map<string, PromiseWithResolvers<any>>();
 const refs = new Map<string, RefController<any>>();
 
 export type SharedRefOptions = {
-  worker: () => { addEventListener: Function };
+  worker: (sharedWorker: SharedWorker) => { addEventListener: Function };
   debug?: boolean;
 };
 
@@ -21,8 +21,7 @@ declare global {
 }
 
 export const initSharedRef = (options: SharedRefOptions) => {
-  (window as any).SharedWorker = SharedWorkerPolyfill;
-  worker = options.worker() as SharedWorkerPolyfill;
+  worker = options.worker(SharedWorkerPolyfill as any) as SharedWorkerPolyfill;
 
   worker.port.start();
 
