@@ -23,7 +23,7 @@ declare global {
 export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill => {
   worker = options.worker({ SharedWorker: SharedWorkerPolyfill as any }) as SharedWorkerPolyfill;
 
-  worker.port.start();
+  if (worker?.port?.start) worker.port.start();
 
   worker.addEventListener("message", (e) => {
     if (options?.debug) console.log("[SharedRef] onmessage", e);
