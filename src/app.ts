@@ -66,7 +66,6 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
       meta: options.meta ?? {},
       id: id,
     } satisfies SharedRefMessageGet);
-    let value: any = options.value;
 
     if (refs.has(options.key)) return refs.get(options.key)!.ref;
 
@@ -74,7 +73,7 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
     refController.ref = customRef((track, trigger) => {
       refController.track = track;
       refController.trigger = trigger;
-      refController.value = value;
+      refController.value = options.value;
       return {
         get() {
           refController.track();
@@ -98,7 +97,8 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
     resolvers.promise.then((v) => {
       const result = v as unknown as SharedRefMessageResult;
       if (result.empty === false) {
-        value = result.value;
+        refController.value = result;
+        refController.trigger();
       }
     });
 
