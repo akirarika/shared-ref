@@ -19,4 +19,5 @@ export declare const sharedRef: <T>(options: {
     key: string;
     value: T;
     meta?: Record<string, any>;
+    waiting?: boolean;
 }) => Promise<Ref<T>>;

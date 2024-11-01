@@ -53,7 +53,7 @@ export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill =
   return worker;
 };
 
-export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any> }): Promise<Ref<T>> => {
+export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any>; waiting?: boolean }): Promise<Ref<T>> => {
   if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") {
     if (!worker) throw new Error("[SharedRef] Shared worker not initialized, call initSharedRef(...) first.");
     await workerReady.promise;
@@ -67,42 +67,81 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
       id: id,
     } satisfies SharedRefMessageGet);
 
-    if (refs.has(options.key)) return refs.get(options.key)!.ref;
+    if (!options.waiting) {
+      if (refs.has(options.key)) return refs.get(options.key)!.ref;
 
-    const refController = {} as RefController<any>;
-    refController.ref = customRef((track, trigger) => {
-      refController.track = track;
-      refController.trigger = trigger;
-      refController.value = options.value;
-      return {
-        get() {
-          refController.track();
-          return refController.value;
-        },
-        set(newValue) {
-          refController.value = newValue;
+      const refController = {} as RefController<any>;
+      refController.ref = customRef((track, trigger) => {
+        refController.track = track;
+        refController.trigger = trigger;
+        refController.value = options.value;
+        return {
+          get() {
+            refController.track();
+            return refController.value;
+          },
+          set(newValue) {
+            refController.value = newValue;
+            refController.trigger();
+            worker!.postMessage({
+              type: "SHARED_REF$SET",
+              key: options.key,
+              meta: options.meta ?? {},
+              value: newValue,
+            } satisfies SharedRefMessageSet);
+          },
+        };
+      });
+
+      refs.set(options.key, refController);
+
+      resolvers.promise.then((v) => {
+        const result = v as unknown as SharedRefMessageResult;
+        if (result.empty === false) {
+          refController.value = result.value;
           refController.trigger();
-          worker!.postMessage({
-            type: "SHARED_REF$SET",
-            key: options.key,
-            meta: options.meta ?? {},
-            value: newValue,
-          } satisfies SharedRefMessageSet);
-        },
-      };
-    });
+        }
+      });
 
-    refs.set(options.key, refController);
-
-    resolvers.promise.then((v) => {
-      const result = v as unknown as SharedRefMessageResult;
+      return refController.ref;
+    } else {
+      let value: any = undefined;
+      const result = (await resolvers.promise) as unknown as SharedRefMessageResult;
       if (result.empty === false) {
-        refController.value = result.value;
-        refController.trigger();
+        value = result.value;
+      } else {
+        value = options.value;
       }
-    });
 
-    return refController.ref;
+      if (refs.has(options.key)) return refs.get(options.key)!.ref;
+
+      const refController = {} as RefController<any>;
+      refController.ref = customRef((track, trigger) => {
+        refController.track = track;
+        refController.trigger = trigger;
+        refController.value = value;
+        return {
+          get() {
+            refController.track();
+            return refController.value;
+          },
+          set(newValue) {
+            refController.value = newValue;
+            refController.trigger();
+            worker!.postMessage({
+              type: "SHARED_REF$SET",
+              key: options.key,
+              meta: options.meta ?? {},
+              value: newValue,
+            } satisfies SharedRefMessageSet);
+          },
+        };
+      });
+
+      refs.set(options.key, refController);
+
+      return refController.ref;
+    }
   } else {
     const cref = customRef((track, trigger) => {
       let value = options.value;
