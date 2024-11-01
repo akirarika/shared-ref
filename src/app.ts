@@ -97,7 +97,7 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
     resolvers.promise.then((v) => {
       const result = v as unknown as SharedRefMessageResult;
       if (result.empty === false) {
-        refController.value = result;
+        refController.value = result.value;
         refController.trigger();
       }
     });
