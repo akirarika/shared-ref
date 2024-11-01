@@ -10,7 +10,9 @@ const waitingGet = new Map<string, PromiseWithResolvers<any>>();
 const refs = new Map<string, RefController<any>>();
 
 export type SharedRefOptions = {
-  worker: (data: { SharedWorker: new (scriptURL: string | URL, options?: string | WorkerOptions) => SharedWorker }) => { addEventListener: Function };
+  worker: (data: { SharedWorker: new (scriptURL: string | URL, options?: string | WorkerOptions) => SharedWorker }) => {
+    addEventListener: Function;
+  };
   debug?: boolean;
 };
 
@@ -64,13 +66,7 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
       meta: options.meta ?? {},
       id: id,
     } satisfies SharedRefMessageGet);
-    let value: any = undefined;
-    const result = (await resolvers.promise) as unknown as SharedRefMessageResult;
-    if (result.empty === false) {
-      value = result.value;
-    } else {
-      value = options.value;
-    }
+    let value: any = options.value;
 
     if (refs.has(options.key)) return refs.get(options.key)!.ref;
 
@@ -98,6 +94,13 @@ export const sharedRef = async <T>(options: { key: string; value: T; meta?: Reco
     });
 
     refs.set(options.key, refController);
+
+    resolvers.promise.then((v) => {
+      const result = v as unknown as SharedRefMessageResult;
+      if (result.empty === false) {
+        value = result.value;
+      }
+    });
 
     return refController.ref;
   } else {
