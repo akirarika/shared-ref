@@ -4,7 +4,7 @@ import { customRef, type Ref } from "vue";
 import type { RefController, SharedRefMessage, SharedRefMessageGet, SharedRefMessageResult, SharedRefMessageSet } from "./types";
 import { nanoid } from "nanoid";
 
-let worker: SharedWorkerPolyfill | undefined = undefined;
+const workerInitd = withResolvers() as PromiseWithResolvers<undefined>;
 const workerReady = withResolvers() as PromiseWithResolvers<undefined>;
 const waitingGet = new Map<string, PromiseWithResolvers<any>>();
 const refs = new Map<string, RefController<any>>();
@@ -19,15 +19,17 @@ export type SharedRefOptions = {
 declare global {
   interface Window {
     sharedRef: typeof sharedRef;
+    __sharedRefWorker: SharedWorkerPolyfill;
   }
 }
 
 export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill => {
-  worker = options.worker({ SharedWorker: SharedWorkerPolyfill as any }) as SharedWorkerPolyfill;
+  window.__sharedRefWorker = options.worker({ SharedWorker: SharedWorkerPolyfill as any }) as SharedWorkerPolyfill;
+  workerInitd.resolve(undefined);
 
-  if (worker?.port?.start) worker.port.start();
+  if (window.__sharedRefWorker?.port?.start) window.__sharedRefWorker.port.start();
 
-  worker.addEventListener("message", (e) => {
+  window.__sharedRefWorker.addEventListener("message", (e) => {
     if (options?.debug) console.log("[SharedRef] onmessage", e);
     const data = e.data as SharedRefMessage;
     if (data.type === "SHARED_REF$PONG") {
@@ -44,19 +46,20 @@ export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill =
     }
   });
 
-  worker!.postMessage({
+  window.__sharedRefWorker.postMessage({
     type: "SHARED_REF$PING",
   });
 
   if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") (window as any).sharedRef = sharedRef;
 
-  return worker;
+  return window.__sharedRefWorker;
 };
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any>; waiting?: boolean }): Promise<Ref<T>> => {
   if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") {
+    await workerInitd.promise;
     await workerReady.promise;
-    if (!worker) throw new Error("[SharedRef] Shared worker not initialized, call initSharedRef(...) first.");
+    const worker = window.__sharedRefWorker;
     const resolvers = withResolvers<T>();
     const id = `${options.key}_${nanoid()}`;
     waitingGet.set(id, resolvers);
