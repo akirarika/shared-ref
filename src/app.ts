@@ -55,8 +55,8 @@ export const initSharedRef = (options: SharedRefOptions): SharedWorkerPolyfill =
 
 export const sharedRef = async <T>(options: { key: string; value: T; meta?: Record<string, any>; waiting?: boolean }): Promise<Ref<T>> => {
   if (typeof window !== "undefined" && typeof window?.document?.createElement !== "undefined") {
-    if (!worker) throw new Error("[SharedRef] Shared worker not initialized, call initSharedRef(...) first.");
     await workerReady.promise;
+    if (!worker) throw new Error("[SharedRef] Shared worker not initialized, call initSharedRef(...) first.");
     const resolvers = withResolvers<T>();
     const id = `${options.key}_${nanoid()}`;
     waitingGet.set(id, resolvers);
